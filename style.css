@@ -1552,3 +1552,72 @@ body[data-theme="dark"][data-section="footer"] .site-header {
   --nav-accent: #efb5e5;
   --nav-line: #684c6d;
 }
+
+.custom-cursor {
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  transform: translate3d(var(--cursor-x, -100px), var(--cursor-y, -100px), 0) translate(-50%, -50%);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.custom-cursor.is-visible {
+  visibility: visible;
+}
+
+.custom-cursor.is-text-entry {
+  visibility: hidden;
+}
+
+.custom-cursor-ring,
+.custom-cursor-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.custom-cursor-ring {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--ink);
+  transition: width 180ms ease, height 180ms ease, background-color 180ms ease;
+}
+
+.custom-cursor-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+}
+
+.custom-cursor.is-hovering .custom-cursor-ring {
+  width: 38px;
+  height: 38px;
+  background: rgb(200 241 105 / 13%);
+}
+
+body.custom-cursor-enabled {
+  cursor: none;
+}
+
+body.custom-cursor-enabled a,
+body.custom-cursor-enabled button,
+body.custom-cursor-enabled .project-grid {
+  cursor: none;
+}
+
+body.custom-cursor-enabled input,
+body.custom-cursor-enabled textarea,
+body.custom-cursor-enabled [contenteditable="true"] {
+  cursor: text;
+}
+
+body.custom-cursor-enabled select {
+  cursor: auto;
+}

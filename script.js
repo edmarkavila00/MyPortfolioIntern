@@ -198,3 +198,35 @@ contactForm.addEventListener("submit", (event) => {
 });
 
 document.querySelector("#year").textContent = new Date().getFullYear();
+
+const customCursor = document.querySelector(".custom-cursor");
+const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+if (finePointer.matches) {
+  document.body.classList.add("custom-cursor-enabled");
+
+  document.addEventListener("pointermove", (event) => {
+    if (event.pointerType !== "mouse") return;
+    customCursor.style.setProperty("--cursor-x", `${event.clientX}px`);
+    customCursor.style.setProperty("--cursor-y", `${event.clientY}px`);
+    customCursor.classList.add("is-visible");
+  });
+
+  document.addEventListener("pointerover", (event) => {
+    if (event.pointerType !== "mouse") return;
+    const target = event.target;
+    customCursor.classList.toggle(
+      "is-hovering",
+      Boolean(target.closest("a, button, .project-card")),
+    );
+    customCursor.classList.toggle(
+      "is-text-entry",
+      Boolean(target.closest("input, textarea, select, [contenteditable='true']")),
+    );
+  });
+
+  window.addEventListener("pointerout", (event) => {
+    if (event.relatedTarget) return;
+    customCursor.classList.remove("is-visible", "is-hovering");
+  });
+}
