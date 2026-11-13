@@ -2,6 +2,8 @@
 
 A responsive personal portfolio website for Edmark, an Information Technology student and aspiring developer in the Philippines. It introduces Edmark, highlights selected projects and skills, and provides ways to get in touch.
 
+[View the live portfolio demo](https://my-intern-portfolio-project.vercel.app/).
+
 ## Features
 
 - Responsive layout for desktop and mobile
@@ -34,9 +36,9 @@ Then visit [http://localhost:8000](http://localhost:8000).
 └── assets/          # Images and downloadable resume
 ```
 
-## Deploy with GitHub Pages
+## Deployment
 
-In the repository on GitHub, open **Settings → Pages**, choose the branch containing the site and the repository root as the source, then save. Once published, GitHub Pages will provide the site URL in the Pages settings.
+The live portfolio is deployed on Vercel: [my-intern-portfolio-project.vercel.app](https://my-intern-portfolio-project.vercel.app/). Push changes to the connected repository to trigger a new deployment.
 
 ## Customization
 
