@@ -37,16 +37,6 @@ The portfolio introduces Edmark, highlights selected projects and skills, and pr
 
 The navigation adapts to smaller screens, and the theme button switches between light and dark modes.
 
-## Run locally
-
-Open `index.html` in a browser, or serve the project directory with a local static web server. For example, if Python is installed:
-
-```bash
-python -m http.server 8000
-```
-
-Then visit [http://localhost:8000](http://localhost:8000).
-
 ## Project files
 
 ```text
