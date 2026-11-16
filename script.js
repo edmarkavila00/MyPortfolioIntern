@@ -143,6 +143,7 @@ refreshProjectCarousel();
 function createGithubProjectCard(repository, index) {
   const card = document.createElement("article");
   card.className = "project-card github-project-card";
+  card.id = `github-project-${repository.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
 
   const image = document.createElement("div");
   image.className = `project-image project-art ${index % 2 ? "art-green" : "art-orange"}`;
@@ -193,6 +194,45 @@ function createGithubProjectCard(repository, index) {
   return card;
 }
 
+function addRepositorySkills(repository, card) {
+  const skillList = document.querySelector(".skill-list");
+  const projectTitle = card.querySelector("h3").textContent.trim();
+  const skills = [...new Set([repository.language, ...(repository.topics || [])].filter(Boolean))];
+
+  skills.forEach((skill) => {
+    const normalizedSkill = skill.toLowerCase().replace(/[-_]/g, " ").trim();
+    let item = [...skillList.querySelectorAll(":scope > li")].find((candidate) => (
+      [...candidate.childNodes]
+        .filter((node) => node.nodeType === Node.TEXT_NODE)
+        .map((node) => node.textContent.trim())
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase().replace(/[-_]/g, " ") === normalizedSkill
+    ));
+
+    if (!item) {
+      item = document.createElement("li");
+      const number = document.createElement("span");
+      number.textContent = String(skillList.children.length + 1).padStart(2, "0");
+      item.append(number, document.createTextNode(` ${skill}`));
+      skillList.append(item);
+    }
+
+    let projectLinks = item.querySelector(".skill-projects");
+    if (!projectLinks) {
+      projectLinks = document.createElement("small");
+      projectLinks.className = "skill-projects";
+      item.append(projectLinks);
+    }
+    if (!projectLinks.querySelector(`a[href="#${card.id}"]`)) {
+      const projectLink = document.createElement("a");
+      projectLink.href = `#${card.id}`;
+      projectLink.textContent = projectTitle;
+      projectLinks.append(projectLink);
+    }
+  });
+}
+
 async function loadGithubProjects() {
   const username = projectCarousel.dataset.githubUser;
   const status = document.querySelector("#github-project-status");
@@ -216,7 +256,9 @@ async function loadGithubProjects() {
     ));
 
     additionalRepositories.forEach((repository, index) => {
-      projectCarousel.append(createGithubProjectCard(repository, index + projectCards.length));
+      const card = createGithubProjectCard(repository, index + projectCards.length);
+      projectCarousel.append(card);
+      addRepositorySkills(repository, card);
     });
     status.textContent = additionalRepositories.length
       ? `Showing ${additionalRepositories.length} more public ${additionalRepositories.length === 1 ? "repository" : "repositories"} from GitHub. New repositories appear here automatically.`
