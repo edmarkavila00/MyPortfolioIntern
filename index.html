@@ -231,7 +231,8 @@
             <a class="contact-email" href="mailto:edmarkavila25@example.com">edmarkavila25@example.com <span aria-hidden="true">↗</span></a>
             <a class="contact-github" href="https://github.com/edmarkavila00" target="_blank" rel="noopener noreferrer">Or find me on GitHub <span aria-hidden="true">↗</span></a>
           </div>
-          <form class="contact-form" id="contact-form">
+          <form class="contact-form" id="contact-form" action="https://api.web3forms.com/submit" method="POST" >
+            <input type="hidden" name="access_key" value="f368c9eb-54ce-44c8-8cdd-04dcc219a2e2">
             <div class="form-row">
               <label>
                 <span>Your name</span>
@@ -247,13 +248,15 @@
               <textarea name="message" rows="5" placeholder="Tell me a little about it..." required></textarea>
             </label>
             <button class="button button-light form-submit" type="submit">Send me a message <span aria-hidden="true">↗</span></button>
-            <p class="form-note">Your email app will open with your message ready to send.</p>
+            <p class="form-note" id="form-status" aria-live="polite">Your message will be sent securely through this form.</p>
           </form>
         </div>
         <span class="contact-decoration" aria-hidden="true">E.</span>
       </div>
     </section>
   </main>
+
+  <div class="form-toast" id="form-toast" role="status" aria-live="polite" hidden></div>
 
   <footer class="site-footer" id="footer">
     <div class="container footer-inner">

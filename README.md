@@ -25,7 +25,7 @@ The portfolio introduces Edmark, highlights selected projects and skills, and pr
 - Light and dark themes
 - Keyboard-accessible mobile navigation and project carousel
 - Resume download
-- Contact form that opens the visitor's default email application
+- Contact form that sends messages through Web3Forms
 
 ## Demo walkthrough
 
@@ -33,7 +33,7 @@ The portfolio introduces Edmark, highlights selected projects and skills, and pr
 2. **About** — Read a short bio and download the resume.
 3. **Projects** — Browse six selected projects. Use the carousel controls or scroll the project row; project cards link to GitHub.
 4. **Skills** — Explore the technologies and the projects where they are used.
-5. **Contact** — Fill in the form to open a pre-addressed, pre-filled message in the visitor's default email application. The form does not send messages directly from the website.
+5. **Contact** — Send a message directly through the contact form. Web3Forms handles delivery and the page displays a success or error status.
 
 The navigation adapts to smaller screens, and the theme button switches between light and dark modes.
 

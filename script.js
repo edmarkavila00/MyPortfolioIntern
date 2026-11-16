@@ -183,18 +183,49 @@ window.addEventListener("resize", updateProjectCarouselDots);
 updateProjectCarouselDots();
 
 const contactForm = document.querySelector("#contact-form");
+const formToast = document.querySelector("#form-toast");
+let formToastTimer;
 
-contactForm.addEventListener("submit", (event) => {
+contactForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const formData = new FormData(contactForm);
-  const name = formData.get("name");
-  const email = formData.get("email");
-  const message = formData.get("message");
-  const subject = encodeURIComponent(`Portfolio message from ${name}`);
-  const body = encodeURIComponent(`From: ${name}\nEmail: ${email}\n\n${message}`);
+  const submitButton = contactForm.querySelector('[type="submit"]');
+  const status = document.querySelector("#form-status");
+  const originalButtonHTML = submitButton.innerHTML;
 
-  window.location.href = `mailto:edmarkavila21@example.com?subject=${subject}&body=${body}`;
+  submitButton.disabled = true;
+  submitButton.textContent = "Sending…";
+  status.textContent = "Sending your message…";
+  status.dataset.state = "sending";
+
+  try {
+    const response = await fetch(contactForm.action, {
+      method: "POST",
+      body: new FormData(contactForm),
+      headers: { Accept: "application/json" },
+    });
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || "The message could not be sent.");
+    }
+
+    contactForm.reset();
+    status.textContent = "Thanks! Your message has been sent.";
+    status.dataset.state = "success";
+    formToast.textContent = "Message sent successfully. Thanks for getting in touch!";
+    formToast.hidden = false;
+    window.clearTimeout(formToastTimer);
+    formToastTimer = window.setTimeout(() => {
+      formToast.hidden = true;
+    }, 5000);
+  } catch (error) {
+    status.textContent = "Sorry, your message could not be sent. Please try again or email me directly.";
+    status.dataset.state = "error";
+  } finally {
+    submitButton.disabled = false;
+    submitButton.innerHTML = originalButtonHTML;
+  }
 });
 
 document.querySelector("#year").textContent = new Date().getFullYear();
