@@ -88,8 +88,9 @@ document.addEventListener("keydown", (event) => {
 });
 
 const projectCarousel = document.querySelector("#project-carousel");
-const projectCards = [...projectCarousel.querySelectorAll(".project-card")];
-const projectCarouselDots = [...document.querySelectorAll(".project-carousel-dot")];
+let projectCards = [...projectCarousel.querySelectorAll(".project-card")];
+const projectCarouselDotsNav = document.querySelector(".project-carousel-dots");
+let projectCarouselDots = [];
 
 function getProjectCardOffset(card) {
   const carouselStyle = getComputedStyle(projectCarousel);
@@ -119,16 +120,115 @@ function updateProjectCarouselDots() {
   });
 }
 
-projectCarouselDots.forEach((dot, index) => {
-  const title = projectCards[index].querySelector("h3").textContent.trim();
-  dot.setAttribute("aria-label", `Show project ${index + 1}: ${title}`);
-  dot.addEventListener("click", () => {
-    projectCarousel.scrollTo({
-      left: getProjectCardOffset(projectCards[index]),
-      behavior: "smooth",
+function refreshProjectCarousel() {
+  projectCards = [...projectCarousel.querySelectorAll(".project-card")];
+  projectCarouselDotsNav.replaceChildren();
+  projectCarouselDots = projectCards.map((card, index) => {
+    const dot = document.createElement("button");
+    dot.className = "project-carousel-dot";
+    dot.type = "button";
+    dot.setAttribute("aria-controls", "project-carousel");
+    dot.setAttribute("aria-label", `Show project ${index + 1}: ${card.querySelector("h3").textContent.trim()}`);
+    dot.addEventListener("click", () => {
+      projectCarousel.scrollTo({ left: getProjectCardOffset(projectCards[index]), behavior: "smooth" });
     });
+    projectCarouselDotsNav.append(dot);
+    return dot;
   });
-});
+  updateProjectCarouselDots();
+}
+
+refreshProjectCarousel();
+
+function createGithubProjectCard(repository, index) {
+  const card = document.createElement("article");
+  card.className = "project-card github-project-card";
+
+  const image = document.createElement("div");
+  image.className = `project-image project-art ${index % 2 ? "art-green" : "art-orange"}`;
+  image.setAttribute("aria-hidden", "true");
+  const symbol = document.createElement("span");
+  symbol.className = "art-symbol";
+  symbol.textContent = repository.name.slice(0, 2).toUpperCase();
+  const number = document.createElement("span");
+  number.className = "project-index";
+  number.textContent = String(index + 1).padStart(2, "0");
+  image.append(symbol, number);
+
+  const info = document.createElement("div");
+  info.className = "project-info";
+  const meta = document.createElement("div");
+  meta.className = "project-meta";
+  const category = document.createElement("span");
+  category.textContent = repository.language ? repository.language.toUpperCase() : "GITHUB REPOSITORY";
+  const updated = document.createElement("span");
+  updated.textContent = `★ ${repository.stargazers_count}`;
+  meta.append(category, updated);
+
+  const title = document.createElement("h3");
+  title.textContent = repository.name.replace(/[-_]/g, " ");
+  const description = document.createElement("p");
+  description.textContent = repository.description || "A public project on GitHub. Open the repository to learn more.";
+  const tags = document.createElement("ul");
+  tags.className = "tag-list";
+  tags.setAttribute("aria-label", "Repository topics");
+  [repository.language, ...(repository.topics || []).slice(0, 4)].filter(Boolean).forEach((tag) => {
+    const item = document.createElement("li");
+    item.textContent = tag;
+    tags.append(item);
+  });
+  const link = document.createElement("a");
+  link.className = "project-link";
+  link.href = repository.html_url;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.append(document.createTextNode("View on GitHub "));
+  const arrow = document.createElement("span");
+  arrow.setAttribute("aria-hidden", "true");
+  arrow.textContent = "↗";
+  link.append(arrow);
+
+  info.append(meta, title, description, tags, link);
+  card.append(image, info);
+  return card;
+}
+
+async function loadGithubProjects() {
+  const username = projectCarousel.dataset.githubUser;
+  const status = document.querySelector("#github-project-status");
+  try {
+    const response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}/repos?type=owner&sort=updated&per_page=100`, {
+      headers: { Accept: "application/vnd.github+json" },
+    });
+    if (!response.ok) throw new Error(`GitHub returned ${response.status}`);
+    const repositories = await response.json();
+    const featuredNames = new Set([...projectCarousel.querySelectorAll(".project-link[href]")]
+      .map((link) => {
+        try {
+          const parts = new URL(link.href).pathname.split("/").filter(Boolean);
+          return parts.length >= 2 && parts[0].toLowerCase() === username.toLowerCase() ? parts[1].toLowerCase() : null;
+        } catch {
+          return null;
+        }
+      }).filter(Boolean));
+    const additionalRepositories = repositories.filter((repository) => (
+      !repository.fork && !repository.archived && !featuredNames.has(repository.name.toLowerCase())
+    ));
+
+    additionalRepositories.forEach((repository, index) => {
+      projectCarousel.append(createGithubProjectCard(repository, index + projectCards.length));
+    });
+    status.textContent = additionalRepositories.length
+      ? `Showing ${additionalRepositories.length} more public ${additionalRepositories.length === 1 ? "repository" : "repositories"} from GitHub. New repositories appear here automatically.`
+      : "Your selected projects are up to date with GitHub. New public repositories will appear here automatically.";
+    refreshProjectCarousel();
+  } catch (error) {
+    status.textContent = "GitHub projects could not be loaded right now. Your selected projects are still available above.";
+    console.warn("Could not load GitHub repositories:", error);
+  }
+}
+
+loadGithubProjects();
 
 let dragPointerId = null;
 let dragStartX = 0;
